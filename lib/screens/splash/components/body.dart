@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_app/components/default_button.dart';
 import 'package:shopping_app/constants.dart';
-import 'package:shopping_app/size_config.dart';
+import 'package:shopping_app/screens/sign_in/sign_in_screen.dart';
+
+import '../components/splash_content.dart';
 
 class Body extends StatefulWidget {
   @override
@@ -8,6 +11,22 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
+  List<Map<String, String>> splashData = [
+    {
+      "text": "Welcome to Tokoto, Let's shop!",
+      "image": "assets/images/splash_1.png"
+    },
+    {
+      "text":
+          "We help people to connect with store \naround United States of America",
+      "image": "assets/images/splash_2.png"
+    },
+    {
+      "text": "We show the easiest way to shop. \nJust stay at home with us",
+      "image": "assets/images/splash_3.png"
+    },
+  ];
+  int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -18,54 +37,58 @@ class _BodyState extends State<Body> {
             Expanded(
               flex: 3,
               child: PageView.builder(
+                onPageChanged: (value) {
+                  setState(() {
+                    currentIndex = value;
+                  });
+                },
                 itemBuilder: (context, index) => SplashContent(
-                  text: "Welcome to Tokoto, Let's shop!",
-                  image: "assets/images/splash_1.png",
+                  text: splashData[index]["text"],
+                  image: splashData[index]["image"],
                 ),
+                itemCount: splashData.length,
               ),
             ),
             Expanded(
               flex: 2,
-              child: Container(
-                color: Colors.white,
-              ),
+              child: Column(children: [
+                Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    splashData.length,
+                    (index) => buildWidget(index: index),
+                  ),
+                ),
+                Spacer(flex: 3),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: DefaultButton(
+                    text: "Continue",
+                    press: () {
+                      Navigator.pushNamed(context, SignInScreen.routeName);
+                    },
+                  ),
+                ),
+                Spacer()
+              ]),
             )
           ],
         ),
       ),
     );
   }
-}
 
-class SplashContent extends StatelessWidget {
-  final String text, image;
-  const SplashContent({
-    Key key,
-    this.text,
-    this.image,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Spacer(),
-        Text(
-          "TOKOTO",
-          style: TextStyle(
-            color: kPrimaryColor,
-            fontSize: getProportionateScreenWidth(24),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(text),
-        Spacer(flex: 2),
-        Image.asset(
-          image,
-          width: getProportionateScreenWidth(235),
-          height: getProportionateScreenHeight(265),
-        )
-      ],
+  AnimatedContainer buildWidget({int index}) {
+    return AnimatedContainer(
+      duration: kAnimationDuration,
+      margin: EdgeInsets.only(right: 6),
+      width: currentIndex == index ? 20 : 6,
+      height: 6,
+      decoration: BoxDecoration(
+        color: currentIndex == index ? kPrimaryColor : Color(0xFFD8D8D8),
+        borderRadius: BorderRadius.all(Radius.circular(3)),
+      ),
     );
   }
 }
